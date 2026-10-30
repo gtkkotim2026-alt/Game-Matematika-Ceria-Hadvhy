@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adu Cepat Berhitung</title>
+<style>
+:root{--bg:#fff4dc;--ink:#2b2b3a;--card:#ffffff;--p1:#e8453c;--p2:#2f6fe4;--acc:#ffb703;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1b2e;--ink:#f5f1ff;--card:#2a2745}}
+:root[data-theme="dark"]{--bg:#1d1b2e;--ink:#f5f1ff;--card:#2a2745;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Comic Sans MS",system-ui,sans-serif;min-height:100vh;user-select:none;-webkit-user-select:none}
+.screen{display:none;max-width:900px;margin:0 auto;padding:14px}
+.screen.on{display:block}
+h1{text-align:center;font-size:clamp(26px,6vw,44px);margin:6px 0}
+.sub{text-align:center;margin:0 0 14px;opacity:.8}
+.card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.card h3{margin:0 0 10px}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.names input{width:100%;font:inherit;font-size:20px;padding:12px;border-radius:14px;border:3px solid;background:var(--bg);color:var(--ink)}
+#n1{border-color:var(--p1)}#n2{border-color:var(--p2)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.opt{font:inherit;font-size:18px;padding:12px;border-radius:16px;border:3px solid transparent;background:var(--bg);color:var(--ink);cursor:pointer}
+.opt b{display:block;font-size:34px}
+.opt.sel{border-color:var(--acc);background:#ffb70333}
+.big{display:block;width:100%;font:inherit;font-size:26px;font-weight:bold;padding:16px;border:0;border-radius:20px;background:var(--acc);color:#2b2b3a;cursor:pointer;box-shadow:0 5px 0 #c98700}
+.big:active{transform:translateY(4px);box-shadow:0 1px 0 #c98700}
+#track{position:relative;border-radius:20px;overflow:hidden;margin-bottom:10px;border:4px solid var(--ink)}
+.lane{position:relative;height:84px}
+.lane+.lane{border-top:3px dashed #fff8}
+.fin{position:absolute;right:2%;top:50%;transform:translateY(-50%);font-size:34px}
+.pl{position:absolute;font-size:46px;line-height:1;transition:left .45s cubic-bezier(.3,1.6,.5,1),bottom .45s cubic-bezier(.3,1.6,.5,1);transform:translateX(-50%)}
+.m-lari .lane{background:#c8794a}.m-dayung .lane{background:repeating-linear-gradient(90deg,#3aa0e8 0 30px,#5bb6f2 30px 60px)}
+.m-lari .lane .pl,.m-dayung .lane .pl{top:50%;margin-top:-23px}
+.m-tangga{display:grid;grid-template-columns:1fr 1fr;background:#9ad6ff}
+.m-tangga .lane{height:300px;background:repeating-linear-gradient(0deg,#b07a3c 0 6px,transparent 6px 30px) center/60% 100% no-repeat,linear-gradient(90deg,transparent 18%,#8a5a22 18% 22%,transparent 22% 78%,#8a5a22 78% 82%,transparent 82%)}
+.m-tangga .lane+.lane{border-top:0;border-left:3px dashed #fff8}
+.m-tangga .pl{left:50%!important}
+.m-tangga .fin{right:auto;left:50%;top:4px;transform:translateX(-50%)}
+.m-tarik{background:#7cc576}
+.m-tarik .lane{height:130px;background:linear-gradient(90deg,#0000 9%,#fff8 9% 9.6%,#0000 9.6% 90.4%,#fff8 90.4% 91%,#0000 91%)}
+.rope{position:absolute;left:4%;right:4%;top:62%;height:9px;background:repeating-linear-gradient(90deg,#8b5a2b 0 8px,#b8844a 8px 16px);border-radius:5px}
+.mid{position:absolute;left:50%;top:20%;bottom:0;width:3px;background:#fff9}
+.m-tarik .pl{top:42%}
+.m-tarik .flag{font-size:38px;top:28%}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.panel{background:var(--card);border-radius:20px;padding:10px;border-top:8px solid;text-align:center}
+.panel.a{border-color:var(--p1)}.panel.b{border-color:var(--p2)}
+.pname{font-weight:bold;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pstar{min-height:26px;font-size:18px}
+.q{font-size:clamp(34px,8vw,60px);font-weight:bold;margin:4px 0 8px}
+.ans{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ans button{font:inherit;font-size:clamp(26px,6vw,44px);font-weight:bold;padding:14px 0;border-radius:16px;border:0;color:#fff;cursor:pointer;position:relative;touch-action:manipulation}
+.a .ans button{background:var(--p1);box-shadow:0 5px 0 #a82a23}.b .ans button{background:var(--p2);box-shadow:0 5px 0 #1d4aa6}
+.ans button:active{transform:translateY(4px)}
+.ans small{position:absolute;left:6px;top:2px;font-size:11px;opacity:.7;font-weight:normal}
+.panel.lock{opacity:.55}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pop{animation:pp .35s}
+@keyframes pp{50%{transform:scale(1.08)}}
+#cd{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#000a;color:#fff;font-size:min(40vw,240px);font-weight:bold;z-index:9}
+#win{text-align:center}
+#win .trophy{font-size:100px}
+#win h2{font-size:clamp(28px,7vw,48px);margin:6px 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.sec{font:inherit;font-size:20px;padding:14px;border-radius:16px;border:3px solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.top .sec{font-size:15px;padding:6px 12px}
+.hint{text-align:center;font-size:13px;opacity:.7;margin-top:8px}
+</style></head><body>
+
+<section id="s-setup" class="screen on">
+  <h1>🏁 Adu Cepat Berhitung 🏁</h1>
+  <p class="sub">Siapa yang paling cepat dan tepat menghitung?</p>
+  <div class="card"><h3>1. Nama pemain</h3>
+    <div class="names"><input id="n1" maxlength="12" placeholder="Pemain 1 🔴"><input id="n2" maxlength="12" placeholder="Pemain 2 🔵"></div></div>
+  <div class="card"><h3>2. Pilih permainan</h3>
+    <div class="opts" id="modes"></div></div>
+  <div class="card"><h3>3. Tingkat soal</h3>
+    <div class="opts" id="levels"></div></div>
+  <button class="big" id="go">▶ MULAI!</button>
+</section>
+
+<section id="s-game" class="screen">
+  <div class="top"><button class="sec" id="back">⬅ Menu</button><b id="title"></b><button class="sec" id="snd">🔊</button></div>
+  <div id="track"></div>
+  <div class="panels">
+    <div class="panel a" id="p0"><div class="pname"></div><div class="pstar"></div><div class="q"></div><div class="ans"></div></div>
+    <div class="panel b" id="p1"><div class="pname"></div><div class="pstar"></div><div class="q"></div><div class="ans"></div></div>
+  </div>
+  <p class="hint">Layar sentuh: tekan jawaban di sisimu. Papan ketik: Pemain 1 = A S D, Pemain 2 = J K L</p>
+</section>
+
+<section id="s-win" class="screen">
+  <div class="card" id="win">
+    <div class="trophy">🏆</div><h2 id="wname"></h2><p id="wtxt"></p>
+    <div class="row"><button class="big" id="again">🔁 Main Lagi</button><button class="sec" id="menu">🏠 Menu</button></div>
+  </div>
+</section>
+<div id="cd"></div>
+
+<script>
+const MODES={
+ lari:{n:'Lari',e:'🏃',em:['🏃','🏃‍♀️'],goal:10,cls:'m-lari',fin:'🏁'},
+ dayung:{n:'Berdayung',e:'🚣',em:['🚣','🚣‍♀️'],goal:10,cls:'m-dayung',fin:'🏝️'},
+ tangga:{n:'Naik Tangga',e:'🪜',em:['🧗','🧗‍♀️'],goal:10,cls:'m-tangga',fin:'⭐'},
+ tarik:{n:'Tarik Tambang',e:'🪢',em:['🦸‍♂️','🦸‍♀️'],goal:5,cls:'m-tarik'}
+};
+const LEVELS=[{n:'Mudah',d:'Tambah sampai 10',i:'🌱'},{n:'Sedang',d:'Tambah & kurang sampai 20',i:'🌿'},{n:'Hebat',d:'Tambah & kurang sampai 50',i:'🌳'}];
+let mode='lari',level=0,names=['',''],score=[0,0],locked=[false,false],ans=[0,0],running=false,sound=true,last=[null,null];
+const $=id=>document.getElementById(id);
+const show=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id))};
+
+function buildOpts(){
+ $('modes').innerHTML=Object.entries(MODES).map(([k,m])=>`<button class="opt ${k===mode?'sel':''}" data-k="${k}"><b>${m.e}</b>${m.n}</button>`).join('');
+ $('levels').innerHTML=LEVELS.map((l,i)=>`<button class="opt ${i===level?'sel':''}" data-i="${i}"><b>${l.i}</b>${l.n}<br><small>${l.d}</small></button>`).join('');
+ $('modes').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{mode=b.dataset.k;buildOpts()});
+ $('levels').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{level=+b.dataset.i;buildOpts()});
+}
+buildOpts();
+
+let ac;
+function beep(f,d=.12,t='sine',v=.15){
+ if(!sound)return;
+ try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+ const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;
+ o.connect(g);g.connect(ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.stop(ac.currentTime+d)}catch(e){}
+}
+$('snd').onclick=()=>{sound=!sound;$('snd').textContent=sound?'🔊':'🔇'};
+
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function makeQ(){
+ let a,b,op,r;
+ if(level===0){a=rnd(1,9);b=rnd(1,10-a);op='+'}
+ else{const max=level===1?20:50;
+  if(Math.random()<.5){a=rnd(1,max-1);b=rnd(1,max-a);op='+'}
+  else{a=rnd(2,max);b=rnd(1,a-1);op='−'}}
+ r=op==='+'?a+b:a-b;
+ const set=new Set([r]);
+ while(set.size<3){const x=r+rnd(-3,3);if(x>=0&&x!==r)set.add(x)}
+ const ch=[...set].sort(()=>Math.random()-.5);
+ return{t:`${a} ${op} ${b} = ?`,r,ch};
+}
+function nextQ(i){
+ let q;do{q=makeQ()}while(last[i]===q.t);last[i]=q.t;
+ ans[i]=q;
+ const p=$('p'+i);
+ p.querySelector('.q').textContent=q.t;
+ const keys=i?['J','K','L']:['A','S','D'];
+ p.querySelector('.ans').innerHTML=q.ch.map((c,k)=>`<button data-k="${k}"><small>${keys[k]}</small>${c}</button>`).join('');
+ p.querySelectorAll('button').forEach(b=>b.onpointerdown=e=>{e.preventDefault();pick(i,+b.dataset.k)});
+}
+function pick(i,k){
+ if(!running||locked[i])return;
+ const p=$('p'+i);
+ if(ans[i].ch[k]===ans[i].r){
+  score[i]++;beep(660,.1,'triangle');setTimeout(()=>beep(880,.12,'triangle'),90);
+  p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop');
+  render();
+  if(isWin(i)){return finish(i)}
+  nextQ(i);
+ }else{
+  beep(160,.25,'sawtooth',.1);locked[i]=true;p.classList.add('lock','shake');
+  setTimeout(()=>{locked[i]=false;p.classList.remove('lock','shake')},900);
+  nextQ(i);
+ }
+}
+function isWin(i){const m=MODES[mode];return mode==='tarik'?Math.abs(score[0]-score[1])>=m.goal:score[i]>=m.goal}
+
+function buildTrack(){
+ const m=MODES[mode],t=$('track');t.className=m.cls;
+ if(mode==='tarik'){
+  t.innerHTML=`<div class="lane"><div class="mid"></div><div class="rope"></div><span class="pl" id="e0">${m.em[0]}</span><span class="pl flag" id="fl">🚩</span><span class="pl" id="e1" style="transform:translateX(-50%) scaleX(-1)">${m.em[1]}</span></div>`;
+ }else{
+  t.innerHTML=[0,1].map(i=>`<div class="lane"><span class="fin">${m.fin}</span><span class="pl" id="e${i}">${m.em[i]}</span></div>`).join('');
+ }
+ render();
+}
+function render(){
+ const m=MODES[mode];
+ [0,1].forEach(i=>{$('p'+i).querySelector('.pstar').textContent='⭐'.repeat(Math.min(score[i],12))});
+ if(mode==='tarik'){
+  const f=50-(score[0]-score[1])*(40/m.goal);
+  $('fl').style.left=f+'%';$('e0').style.left=(f-11)+'%';$('e1').style.left=(f+11)+'%';
+ }else if(mode==='tangga'){
+  [0,1].forEach(i=>{$('e'+i).style.bottom=(4+score[i]/m.goal*70)+'%'});
+ }else{
+  [0,1].forEach(i=>{$('e'+i).style.left=(6+score[i]/m.goal*80)+'%'});
+ }
+}
+function start(){
+ names=[$('n1').value.trim()||'Pemain 1',$('n2').value.trim()||'Pemain 2'];
+ score=[0,0];locked=[false,false];last=[null,null];running=false;
+ $('title').textContent=MODES[mode].e+' '+MODES[mode].n;
+ [0,1].forEach(i=>{$('p'+i).querySelector('.pname').textContent=names[i];$('p'+i).classList.remove('lock','shake')});
+ show('s-game');buildTrack();[0,1].forEach(nextQ);
+ const cd=$('cd');cd.style.display='flex';let n=3;
+ const tick=()=>{
+  if(n>0){cd.textContent=n;beep(440,.2);n--;setTimeout(tick,800)}
+  else{cd.textContent='GO!';beep(880,.4,'square',.1);setTimeout(()=>{cd.style.display='none';running=true},500)}
+ };tick();
+}
+function finish(i){
+ running=false;beep(523,.15);setTimeout(()=>beep(659,.15),150);setTimeout(()=>beep(784,.3),300);
+ setTimeout(()=>{
+  $('wname').textContent='🎉 '+names[i]+' Menang! 🎉';
+  $('wtxt').textContent=`Skor ${names[0]}: ${score[0]} • Skor ${names[1]}: ${score[1]}. Hebat! Tetap semangat belajar ya!`;
+  show('s-win');
+ },700);
+}
+$('go').onclick=start;$('again').onclick=start;
+$('menu').onclick=()=>show('s-setup');
+$('back').onclick=()=>{running=false;$('cd').style.display='none';show('s-setup')};
+document.addEventListener('keydown',e=>{
+ const k=e.key.toUpperCase(),m={A:[0,0],S:[0,1],D:[0,2],J:[1,0],K:[1,1],L:[1,2]}[k];
+ if(m)pick(m[0],m[1]);
+});
+</script>
+</body></html>
